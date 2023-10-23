@@ -106,6 +106,8 @@ Use PowerShell to apply full auditing to a file:
 - [Set-Acl: Grant Administrators Full Control of a File](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.security/set-acl?view=powershell-7.3#example-5-grant-administrators-full-control-of-the-file)
 
 ```powershell
+# Enable-AuditingForFile.ps1
+
 # Target file to audit
 $path = "C:\Path\To\Secrets.txt"
 
