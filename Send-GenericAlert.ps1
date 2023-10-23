@@ -1,3 +1,5 @@
+# Send-GenericAlert.ps1
+
 # The full URL to your webhook
 $webhook = '<your-webhook-url>'
 
