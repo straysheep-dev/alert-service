@@ -628,11 +628,13 @@ Unfortunately once an adversary successfully has SYSTEM and hasn't been kicked o
 
 The scripts as of now were built to run on Ubuntu Linux (tested on 20.04 and 22.04).
 
-They use a webhook to POST information via `curl` to a Discord server.
+They use a webhook to POST information via `curl` to an alert channel.
 
-`alert.sh` functions as the log monitoring and POST mechanism, tailing any file you require (it's easy to add functions for different logs based on your requirements) and sending lines that match your rule(s) to Discord.
+- `/var/log/auth.log` is used for all login and sudo alerts
+- `/var/log/audit/audit.log` is used for specific monitoring and would be based on your auditd rule file(s)
+
+`alert.sh` functions as the log monitoring and POST mechanism, tailing any file you require (it's easy to add functions for different logs based on your requirements) and sending lines that match your rule(s) to your webhook.
 
 `alert-service.sh` configures this as a systemd service to restart automatically or if it ever stops.
 
 While only root can read the script containing the webhook URL, an unfortunate side effect of using a webhook via `curl` is that anyone on the system can pull the URL from the process list with `ps aux` if timed correctly, or by using a process monitoring tool like [`pspy`](https://github.com/DominicBreuker/pspy). This will need addressed in a future revision. For now, having the capability of receiving a text message if your server is logged into outweighs the risk of having a private webhook stolen.
-
