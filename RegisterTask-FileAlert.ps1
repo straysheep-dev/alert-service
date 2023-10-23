@@ -1,3 +1,5 @@
+# RegisterTask-FileAlert.ps1
+
 # Name of the task
 $taskname = "File Audit Alert"
 
