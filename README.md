@@ -19,6 +19,18 @@ This type of alerting provides huge value without the need to set up much infras
 This repo details examples on how to impliment the alerting itself and expands upon the references above. IppSec's videos go into further detail on Sysmon logs, ways to use the Task Scheduler and [deploying it as a GPO](https://www.youtube.com/watch?v=J9owPmgmfvo&t=1545s). Cyber Deception will show you the fundamentals of how to proactively detect suspicious activity. With all three combined, the goal is you'll hopefully have greater visibility into your environment with minimal overhead.
 
 
+## Contents
+
+- [Setup in Slack or Discord](#setup-in-slack-or-discord)
+- [Windows](#windows)
+	- [Configure Auditing](#configure-auditing)
+	- [Create the Scheduled Task (GUI)](#create-the-scheduled-task-gui)
+	- [Create the Scheduled Task (PowerShell)](#create-the-scheduled-task-powershell)
+	- [Create the Webhook](#create-the-webhook)
+	- [Try to Break the Webhook](#try-to-break-the-webhook)
+- [Linux](#linux)
+
+
 ## Setup in Slack or Discord
 
 *Specific steps and menus may change over time, this is the general process in both Slack and Discord for reference.*
@@ -296,6 +308,8 @@ Through trial and error we'll find that the `Subscription` Trigger property work
 PowerShell block to create a Scheduled Task that triggers on Event Id 4801 (Workstation Unlock):
 
 ```powershell
+# RegisterTask-UnlockAlert.ps1
+
 # Name of the task
 $taskname = "Unlock Alert"
 
@@ -335,6 +349,8 @@ Register-ScheduledTask "$taskname" -Action $action -Trigger $trigger -Principal 
 PowerShell Block to create a Scheduled Task that triggers on login (any account):
 
 ```powershell
+# RegisterTask-LoginAlert.ps1
+
 $taskname = "Login Alert"
 $action = New-ScheduledTaskAction -Execute "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -Argument "-nop -ep bypass -w hidden C:\Tools\Scripts\Send-LoginAlert.ps1"
 $trigger = New-ScheduledTaskTrigger -AtLogon
@@ -352,6 +368,8 @@ PowerShell Block to create a Scheduled Task that triggers on login (unique user,
 - This task will only run if $honeyaccount logs in
 
 ```powershell
+# RegisterTask-HoneyAccountAlert.ps1
+
 $honeyaccount = "<account-name>"
 $taskname = "Honey Account Alert"
 $action = New-ScheduledTaskAction -Execute "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -Argument "-nop -ep bypass -w hidden C:\Tools\Scripts\Send-LoginAlert.ps1"
@@ -370,6 +388,8 @@ PowerShell block to create a Scheduled Task that triggers on Event Id 4656, hand
 - *NOTE: If there's a syntax
 
 ```powershell
+# RegisterTask-FileAlert.ps1
+
 # Name of the task
 $taskname = "File Audit Alert"
 
@@ -444,6 +464,8 @@ This sets the ownership of the file to the Administrators group, and removes obj
 This PowerShell script can be used with any scheduled task to record a username, timestamp, hostname, (really anything about the environment you want to put into a PowerShell variable) to your alerts channel. This is a base script used to show what you can do with PowerShell and webhooks.
 
 ```powershell
+# Send-GenericAlert.ps1
+
 # The full URL to your webhook
 $webhook = '<your-webhook-url>'
 
