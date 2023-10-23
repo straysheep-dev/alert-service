@@ -1,3 +1,5 @@
+# Enable-AuditingForFile.ps1
+
 # Target file to audit
 $path = "C:\Path\To\Secrets.txt"
 
