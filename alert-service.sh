@@ -37,6 +37,7 @@ function CheckPath() {
 	
 	# If the script exists, ensure the correct permissions are applied
 	# Only root should have read access to this file because the webhook must exist in plain text
+	chown root:root "$SCRIPT_PATH" || exit 1
 	chmod 700 "$SCRIPT_PATH" || exit 1
 
 }
