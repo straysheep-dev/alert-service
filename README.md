@@ -4,7 +4,7 @@
 
 The code examples and scripts are copy & paste ready to use. Add your webhook, and change the variables or filepaths as needed.
 
-This project is based on two of ippsec's videos documenting the same concept:
+This project is based on two of IppSec's videos documenting the same concept:
 
 - [Creating Webhooks in Slack for PowerShell](https://www.youtube.com/watch?v=1w0btuMAvZk)
 - [Send Notifications to Slack via Scheduled Task Event Filter](https://www.youtube.com/watch?v=J9owPmgmfvo)
