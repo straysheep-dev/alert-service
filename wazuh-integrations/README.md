@@ -13,7 +13,7 @@ The biggest change however is updating the variables to work when arbitrary JSON
 The variables are built with conditional checks similar to one of the original [slack.py variables](https://github.com/wazuh/wazuh/blob/a5f51ad61af5abcf49186cd72d4d73c0c3927021/integrations/slack.py#L159), so that it will attempt to find the correct key and value, otherwise defaulting to 'N/A' or skipping that key entirely if it's absent.
 
 
-## Update Wazuh Conf
+## Update ossec.conf
 
 You'll need to append one or more `<integration>` sections to `/var/ossec/etc/ossec.conf`, that includes the integration name, webhook, and any filters or options.
 
