@@ -2,6 +2,8 @@
 
 This is a custom integration for shipping alerts to Discord via an embed / webhook.
 
+ <img src=./media/wazuh_integration_discord_2.png width="390" /> <img src=./media/wazuh_integration_discord_3.png width="500" />
+
 Examples of this [already](https://github.com/eugenio-chaves/eugenio-chaves.github.io/blob/main/blog/2022/creating-a-custom-wazuh-integration/index.md#customizing-the-script) [exist](https://github.com/maikroservice/wazuh-integrations/blob/main/discord/custom-discord.py), making great points of reference to build and revise your own integration. However this port does a few things differently.
 
 - Uses the existing [slack.py `generate_msg`](https://github.com/wazuh/wazuh/blob/a5f51ad61af5abcf49186cd72d4d73c0c3927021/integrations/slack.py#L132) function's code and overall formatting with conditional fields
@@ -39,7 +41,11 @@ This section can have multiple entries utilizing the same integration. The sampl
 ```
 
 
-**Examples**
+### Examples
+
+Sysmon alert with networking information:
+
+<img src=./media/wazuh_integration_discord_1.png width="440" />
 
 Many file integrity monitoring events caused by package upgrades or Windows updates will be level 7 or lower. Settting the group to `syscheck` and a minimum severity level of `8` will forward anything out of the ordinary to your alert channel.
 
