@@ -110,3 +110,8 @@ python3 ./custom-discord.py 'test.json' '' '<webhook>' 'debug'
 ```
 
 Where test.json is a file containing a single log entry (it does not have to be a single line, just one log entry) for testing purposes. Debug output will be writting to `./integrations.log` in the current directory.
+
+
+## License
+
+This port maintains the same [GPL-2.0](https://github.com/wazuh/wazuh/blob/master/LICENSE#L64) license as the original scripts.
