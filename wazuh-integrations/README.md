@@ -4,13 +4,11 @@ This is a custom integration for shipping alerts to Discord via an embed / webho
 
 Examples of this [already](https://github.com/eugenio-chaves/eugenio-chaves.github.io/blob/main/blog/2022/creating-a-custom-wazuh-integration/index.md#customizing-the-script) [exist](https://github.com/maikroservice/wazuh-integrations/blob/main/discord/custom-discord.py), making great points of reference to build and revise your own integration. However this port does a few things differently.
 
-- Uses the existing [slack.py `generate_msg`](https://github.com/wazuh/wazuh/blob/a5f51ad61af5abcf49186cd72d4d73c0c3927021/integrations/slack.py#L132) function's code formatting with conditional fields
-- Adds conditional fields that will be included with certain Sysmon events
+- Uses the existing [slack.py `generate_msg`](https://github.com/wazuh/wazuh/blob/a5f51ad61af5abcf49186cd72d4d73c0c3927021/integrations/slack.py#L132) function's code and overall formatting with conditional fields
+- Adds conditional fields that will be included with certain Sysmon / sysmonforlinux events
 - Includes the optional [`filter_msg` function from shuffle.py](https://github.com/wazuh/wazuh/blob/a5f51ad61af5abcf49186cd72d4d73c0c3927021/integrations/shuffle.py#L166) to filter events if their rule ID matches any in `SKIP_RULE_IDS`
 
-The biggest change however is updating the variables to work when arbitrary JSON structures are present in logs, such as when the `_source` field is prepended. This seems to be the case not just when using custom decoder files, rules, or logging sources, but in general. [A post on the elasticsearch forum details resolving this issue (happening in the dashboard view in that case) by declaring `_source` as a metaField variable in Kibana](https://discuss.elastic.co/t/decode-json-in--source-into-fields/92137), however a comparible option doesn't seem to be present in Wazuh's built in settings, as the issue is not with the dashboard interpreting log content. Searching the docs for the term `metaField` or `_source` only returns [mentioning of the health check options](https://documentation.wazuh.com/current/user-manual/wazuh-dashboard/config-file.html#checks-metafields) and [various results containing JSON log samples showing a `_source` field](https://documentation.wazuh.com/current/search.html?q=_source&check_keywords=yes&area=default). This will need reviewed, but for now having examples of the logic required for conditonal variables will be useful if rewriting or expanding them is ever necessary.
-
-The variables are built with conditional checks similar to one of the original [slack.py variables](https://github.com/wazuh/wazuh/blob/a5f51ad61af5abcf49186cd72d4d73c0c3927021/integrations/slack.py#L159), so that it will attempt to find the correct key and value, otherwise defaulting to 'N/A' or skipping that key entirely if it's absent.
+The variables are built with conditional checks similar to one of the original [slack.py variables](https://github.com/wazuh/wazuh/blob/a5f51ad61af5abcf49186cd72d4d73c0c3927021/integrations/slack.py#L159), so that it will attempt to find the correct key and value, otherwise defaulting to 'N/A' or skipping that key entirely if it's absent. This is to avoid [KeyErrors](https://docs.python.org/3/library/exceptions.html#KeyError) for missing keys in arbitrary JSON structures.
 
 
 ## Update ossec.conf
@@ -56,6 +54,10 @@ sudo systemctl restart wazuh-manager
 
 
 ## Debugging
+
+**IMPORTANT**:
+
+> When debugging using raw JSON logs, be careful to copy JSON data from the "Dashboard" view, instead of the "Events" view. You'll see the entire JSON structure is prepended with a few fields, including "_source". This will break the variables in the script, as Wazuh already "sees" those keys as metaFields and parses them correctly when using the script on its own.
 
 You can manually test the python script in debugging mode by copying it to your current directory, then uncommenting the extra `#LOG_FILE =` line, swapping it in for the other one above it. Run with:
 

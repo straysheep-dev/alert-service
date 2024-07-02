@@ -172,7 +172,7 @@ def filter_msg(alert) -> bool:
     # From https://github.com/wazuh/wazuh/blob/a5f51ad61af5abcf49186cd72d4d73c0c3927021/integrations/shuffle.py#L166
     # Skips any rule ID listed in SKIP_RULE_IDS above.
     # This is the same rule_id variable from the generate_msg() function, just below
-    rule_id = alert['_source']['rule']['id'] if '_source' in alert and 'rule' in alert['_source'] and 'id' in alert['_source']['rule'] else alert['rule']['id'] if 'id' in alert['rule'] else 'N/A'
+    rule_id = alert['rule']['id'] if 'id' in alert['rule'] else 'N/A'
     return rule_id not in SKIP_RULE_IDS
 
 
@@ -200,29 +200,35 @@ def generate_msg(alert: any, options: any) -> str:
     # - https://github.com/eugenio-chaves/eugenio-chaves.github.io/blob/main/blog/2022/creating-a-custom-wazuh-integration/index.md#customizing-the-script
     # - https://github.com/maikroservice/wazuh-integrations/blob/main/discord/custom-discord.py
 
-    # Conditional Variables (syntax is very simialr to Ansible's 'when:' conditional)
-    # Some logs decode to have a _source field prepended, which breaks all of the original literal variables.
-    # These variables were moved here for readability, and have nested conditional statements to account for this, ending in some
+    # IMPORTANT:
+    # When debugging using raw JSON logs, be careful to copy JSON data from the "Dashboard" view, instead of the "Events" view. You'll see
+    # the entire JSON structure is prepended with a few fields, including "_source". This will break the variables below, as Wazuh already
+    # "sees" those keys as metaFields and parses them correctly when using this script.
+
+    # Conditional Variables (syntax is very simialr to Ansible's 'when:' conditional thanks to python)
+    # All variables were moved here for readability, and have nested conditional statements to account different log strucutres, ending in some
     # cases with a default of 'N/A' to catch if none are true.
     # The conditionals are also meant to avoid KeyErrors (https://docs.python.org/3/library/exceptions.html#KeyError) for missing
     # keys in arbitrary JSON structures.
-    # This integration was tested using auditd, and sysmonforlinux, with the Wazuh rules and decoder files from SOCFortress
+    # This integration was tested using auditd, Sysmon, and sysmonforlinux, with the following Wazuh rules and decoder files from SOCFortress
     # - https://github.com/socfortress/Wazuh-Rules/tree/main/Auditd
     # - https://github.com/socfortress/Wazuh-Rules/tree/main/Sysmon%20Linux
-    timestamp = alert['_source']['timestamp'] if '_source' in alert and 'timestamp' in alert['_source'] else alert['timestamp'] if 'timestamp' in alert else 'N/A'
-    severity = alert['_source']['rule']['level'] if '_source' in alert and 'rule' in alert['_source'] and 'level' in alert['_source']['rule'] else alert['rule']['level']
-    description = alert['_source']['rule']['description'] if '_source' in alert and 'rule' in alert['_source'] and 'description' in alert['_source']['rule'] else alert['rule']['description'] if 'description' in alert['rule'] else 'N/A'
-    agent_id = alert['_source']['agent']['id'] if '_source' in alert and 'agent' in alert['_source'] and 'id' in alert['_source']['agent'] else alert['agent']['id']
-    agent_name = alert['_source']['agent']['name'] if '_source' in alert and 'agent' in alert['_source'] and 'name' in alert['_source']['agent'] else alert['agent']['name']
-    rule_id = alert['_source']['rule']['id'] if '_source' in alert and 'rule' in alert['_source'] and 'id' in alert['_source']['rule'] else alert['rule']['id'] if 'id' in alert['rule'] else 'N/A'
-    location = alert['_source']['location'] if '_source' in alert and 'location' in alert['_source'] else alert['location'] if 'location' in alert else 'N/A'
-    dest_ip = alert['_source']['data']['eventdata']['DestinationIp'] if '_source' in alert and 'data' in alert['_source'] and 'eventdata' in alert['_source']['data'] else 'N/A'
-    dest_port = alert['_source']['data']['eventdata']['destinationPort'] if '_source' in alert and 'data' in alert['_source'] and 'eventdata' in alert['_source']['data'] else 'N/A'
-    dest_host = alert['_source']['data']['eventdata']['destinationHostname'] if '_source' in alert and 'data' in alert['_source'] and 'eventdata' in alert['_source']['data'] else 'N/A'
-    src_ip = alert['_source']['data']['eventdata']['sourceIp'] if '_source' in alert and 'data' in alert['_source'] and 'eventdata' in alert['_source']['data'] else 'N/A'
-    src_port = alert['_source']['data']['eventdata']['sourcePort'] if '_source' in alert and 'data' in alert['_source'] and 'eventdata' in alert['_source']['data'] else 'N/A'
-    full_log = alert['_source']['full_log'] if '_source' in alert and 'full_log' in alert['_source'] else alert['full_log'] if 'full_log' in alert else 'N/A'
-    log_id = alert['_source']['id'] if '_source' in alert and 'id' in alert['_source'] else alert['id'] if 'id' in alert else 'N/A'
+    # - The built in decoder and rules were used for Sysmon (on Windows)
+    timestamp = alert['timestamp'] if 'timestamp' in alert else 'N/A'
+    severity = alert['rule']['level']
+    description = alert['rule']['description'] if 'description' in alert['rule'] else 'N/A'
+    agent_id = alert['agent']['id'] if 'id' in alert['agent'] else 'N/A'
+    agent_name = alert['agent']['name'] if 'name' in alert['agent'] else 'N/A'
+    rule_id = alert['rule']['id'] if 'id' in alert['rule'] else 'N/A'
+    location = alert['location']
+    dest_ip = alert['data']['eventdata']['DestinationIp'] if 'data' in alert and 'eventdata' in alert['data'] and 'DestinationIp' in alert['data']['eventdata'] else 'N/A'
+    dest_port = alert['data']['eventdata']['destinationPort'] if 'data' in alert and 'eventdata' in alert['data'] and 'destinationPort' in alert['data']['eventdata'] else 'N/A'
+    dest_host = alert['data']['eventdata']['destinationHostname'] if 'data' in alert and 'eventdata' in alert['data'] and 'destinationHostname' in alert['data']['eventdata'] else 'N/A'
+    src_ip = alert['data']['eventdata']['sourceIp'] if 'data' in alert and 'eventdata' in alert['data'] and 'sourceIp' in alert['data']['eventdata'] else 'N/A'
+    src_port = alert['data']['eventdata']['sourcePort'] if 'data' in alert and 'eventdata' in alert['data'] and 'sourcePort' in alert['data']['eventdata'] else 'N/A'
+    full_log = alert['full_log'] if 'full_log' in alert else 'N/A'
+    win_message = alert['data']['win']['system']['message'] if 'data' in alert and 'win' in alert['data'] and 'system' in alert['data']['win'] and 'message' in alert['data']['win']['system'] else 'N/A'
+    log_id = alert['id']
 
     # Rule filter to skip rules in SKIP_RULE_IDS
     if not filter_msg(alert):
@@ -257,7 +263,7 @@ def generate_msg(alert: any, options: any) -> str:
             'inline': False
         }
     )
-    if 'agent' in alert or '_source' in alert and 'agent' in alert['_source']:
+    if 'agent' in alert:
         msg['fields'].append(
             {
                 'name': 'Agent',
@@ -265,7 +271,7 @@ def generate_msg(alert: any, options: any) -> str:
                 'inline': True
             }
         )
-    if 'agentless' in alert or '_source' in alert and 'agentless' in alert['_source']:
+    if 'agentless' in alert:
         msg['fields'].append(
             {
                 'name': 'Agentless Host',
@@ -289,7 +295,7 @@ def generate_msg(alert: any, options: any) -> str:
     )
     # The remaining fields have been formatted with a code block using one ` or three ``` backticks to prevent malicious strings from potentially
     # making network requests or being clickable
-    if '_source' in alert and 'data' in alert['_source'] and 'eventdata' in alert['_source']['data'] and 'DestinationIp' in alert['_source']['data']['eventdata']:
+    if 'data' in alert and 'eventdata' in alert['data'] and 'DestinationIp' in alert['data']['eventdata']:
         msg['fields'].append(
             {
                 'name': 'Dest IP',
@@ -297,7 +303,7 @@ def generate_msg(alert: any, options: any) -> str:
                 'inline': True
             }
         )
-    if '_source' in alert and 'data' in alert['_source'] and 'eventdata' in alert['_source']['data'] and 'destinationPort' in alert['_source']['data']['eventdata']:
+    if 'data' in alert and 'eventdata' in alert['data'] and 'destinationPort' in alert['data']['eventdata']:
         msg['fields'].append(
             {
                 'name': 'Dest Port',
@@ -305,7 +311,7 @@ def generate_msg(alert: any, options: any) -> str:
                 'inline': True
             }
         )
-    if '_source' in alert and 'data' in alert['_source'] and 'eventdata' in alert['_source']['data'] and 'destinationHostname' in alert['_source']['data']['eventdata']:
+    if 'data' in alert and 'eventdata' in alert['data'] and 'destinationHostname' in alert['data']['eventdata']:
         msg['fields'].append(
             {
                 'name': 'Dest Host',
@@ -313,7 +319,7 @@ def generate_msg(alert: any, options: any) -> str:
                 'inline': True
             }
         )
-    if '_source' in alert and 'data' in alert['_source'] and 'eventdata' in alert['_source']['data'] and 'sourceIp' in alert['_source']['data']['eventdata']:
+    if 'data' in alert and 'eventdata' in alert['data'] and 'sourceIp' in alert['data']['eventdata']:
         msg['fields'].append(
             {
                 'name': 'Source IP',
@@ -321,7 +327,7 @@ def generate_msg(alert: any, options: any) -> str:
                 'inline': True
             }
         )
-    if '_source' in alert and 'data' in alert['_source'] and 'eventdata' in alert['_source']['data'] and 'sourcePort' in alert['_source']['data']['eventdata']:
+    if 'data' in alert and 'eventdata' in alert['data'] and 'sourcePort' in alert['data']['eventdata']:
         msg['fields'].append(
             {
                 'name': 'Source Port',
@@ -329,13 +335,22 @@ def generate_msg(alert: any, options: any) -> str:
                 'inline': True
             }
         )
-    msg['fields'].append(
-        {
-            'name': 'Full Log',
-            'value': '```{0}```'.format(full_log),
-            'inline': False
-        }
-    )
+    if 'full_log' in alert:
+        msg['fields'].append(
+            {
+                'name': 'Full Log',
+                'value': '```{0}```'.format(full_log),
+                'inline': False
+            }
+        )
+    if 'data' in alert and 'win' in alert['data'] and 'system' in alert['data']['win'] and 'message' in alert['data']['win']['system']:
+        msg['fields'].append(
+            {
+                'name': 'Message',
+                'value': '```{0}```'.format(win_message),
+                'inline': False
+            }
+        )
     msg['fields'].append(
         {
             'name': 'Wazuh ID',
