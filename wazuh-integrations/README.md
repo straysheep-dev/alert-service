@@ -20,22 +20,60 @@ This section can have multiple entries utilizing the same integration. The sampl
 ```xml
 <ossec_config>
   <integration>
-      <name>custom-discord</name>
-      <hook_url>https://discord.com/api/webhooks/XXXXXXXXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXX</hook_url>
-      <group>GROUP</group> <!-- Replace with an optional comma separated list of groups or remove it -->
-      <rule_id>RULE_ID</rule_id> <!-- Replace with an optional comma separated list of rule ids or remove it -->
-      <level>SEVERITY_LEVEL</level> <!-- Replace with an optional minimum severity level or remove it -->
-      <event_location>EVENT_LOCATION</event_location> <!-- Replace with an optional comma separated list of event locations or remove it -->
-      <alert_format>json</alert_format>
-      <options>JSON</options> <!-- Replace with your custom JSON object or remove it -->
+    <name>custom-discord</name>
+    <hook_url>https://discord.com/api/webhooks/XXXXXXXXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXX</hook_url>
+    <group>GROUP</group> <!-- Replace with an optional comma separated list of groups or remove it -->
+    <rule_id>RULE_ID</rule_id> <!-- Replace with an optional comma separated list of rule ids or remove it -->
+    <level>SEVERITY_LEVEL</level> <!-- Replace with an optional minimum severity level or remove it -->
+    <event_location>EVENT_LOCATION</event_location> <!-- Replace with an optional comma separated list of event locations or remove it -->
+    <alert_format>json</alert_format>
+    <options>JSON</options> <!-- Replace with your custom JSON object or remove it -->
   </integration>
   <integration>
-      <name>custom-discord</name>
-      <hook_url>https://discord.com/api/webhooks/XXXXXXXXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXX</hook_url>
-      <group>GROUP</group> <!-- Replace with an optional comma separated list of groups or remove it -->
-      <alert_format>json</alert_format>
+    <name>custom-discord</name>
+    <hook_url>https://discord.com/api/webhooks/XXXXXXXXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXX</hook_url>
+    <group>GROUP</group> <!-- Replace with an optional comma separated list of groups or remove it -->
+    <alert_format>json</alert_format>
   </integration>
 </ossec_config>
+```
+
+
+**Examples**
+
+Many file integrity monitoring events caused by package upgrades or Windows updates will be level 7 or lower. Settting the group to `syscheck` and a minimum severity level of `8` will forward anything out of the ordinary to your alert channel.
+
+```xml
+  <integration>
+    <name>custom-discord</name>
+    <hook_url>https://discord.com/api/webhooks/XXXXXXXXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXX</hook_url>
+    <group>syscheck</group>
+    <level>8</level>
+    <alert_format>json</alert_format>
+  </integration>
+```
+
+Receive an alert for all authentications, Windows logons, or `sudo` / PAM privilege escalations (high volume, try to limit to certain assets):
+
+```xml
+  <integration>
+    <name>custom-discord</name>
+    <hook_url>https://discord.com/api/webhooks/XXXXXXXXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXX</hook_url>
+    <group>authentication_success</group>
+    <alert_format>json</alert_format>
+  </integration>
+```
+
+Generic behavior often produces logs lower than severity level 6. Alerting on levels `6` or higher of `sysmon`, `windows_security` and `audit` logs can help point to an initial compromise or foothold.
+
+```xml
+  <integration>
+    <name>custom-discord</name>
+    <hook_url>https://discord.com/api/webhooks/XXXXXXXXXXXXXXX/XXXXXXXXXXXXXXXXXXXXXXX</hook_url>
+    <group>sysmon,windows_security,audit</group>
+    <level>6</level>
+    <alert_format>json</alert_format>
+  </integration>
 ```
 
 
