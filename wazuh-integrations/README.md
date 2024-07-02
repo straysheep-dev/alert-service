@@ -95,7 +95,7 @@ sudo systemctl restart wazuh-manager
 
 **IMPORTANT**:
 
-> When debugging using raw JSON logs, be careful to copy JSON data from the "Dashboard" view, instead of the "Events" view. You'll see the entire JSON structure is prepended with a few fields, including "_source". This will break the variables in the script, as Wazuh already "sees" those keys as metaFields and parses them correctly when using the script on its own.
+> When debugging using raw JSON logs, be sure to copy JSON data from the "Dashboard" view, instead of the "Events" view. You'll see the entire JSON structure is prepended with a few fields, including "_source". This will break the variables in the script, as Wazuh already "sees" those keys as metaFields and parses them correctly when using the script on its own.
 
 You can manually test the python script in debugging mode by copying it to your current directory, then uncommenting the extra `#LOG_FILE =` line, swapping it in for the other one above it. Run with:
 

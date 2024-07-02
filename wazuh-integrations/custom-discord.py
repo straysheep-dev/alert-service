@@ -201,12 +201,12 @@ def generate_msg(alert: any, options: any) -> str:
     # - https://github.com/maikroservice/wazuh-integrations/blob/main/discord/custom-discord.py
 
     # IMPORTANT:
-    # When debugging using raw JSON logs, be careful to copy JSON data from the "Dashboard" view, instead of the "Events" view. You'll see
+    # When debugging using raw JSON logs, be sure to copy JSON data from the "Dashboard" view, instead of the "Events" view. You'll see
     # the entire JSON structure is prepended with a few fields, including "_source". This will break the variables below, as Wazuh already
     # "sees" those keys as metaFields and parses them correctly when using this script.
 
     # Conditional Variables (syntax is very simialr to Ansible's 'when:' conditional thanks to python)
-    # All variables were moved here for readability, and have nested conditional statements to account different log strucutres, ending in some
+    # All variables were moved here for readability, and have nested conditional statements to account for different log strucutres, ending in some
     # cases with a default of 'N/A' to catch if none are true.
     # The conditionals are also meant to avoid KeyErrors (https://docs.python.org/3/library/exceptions.html#KeyError) for missing
     # keys in arbitrary JSON structures.
