@@ -362,11 +362,11 @@ def generate_msg(alert: any, options: any) -> str:
     if options:
         msg.update(options)
 
-    payload = {'embeds': [msg]}
+    discord_embed = {'embeds': [msg]}
     if options:
-        payload.update(options)
+        discord_embed.update(options)
 
-    return json.dumps(payload)
+    return json.dumps(discord_embed)
 
 
 def send_msg(msg: str, url: str) -> None:
